@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.20;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interface/IMooBnM.sol";
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
@@ -8,13 +9,13 @@ import "../interface/IMooBnM.sol";
 contract BeefyBnMVault {
     IMooBnM mooBnMToken;
     uint public currentAPR;
-    IBnM bnMToken;
+    IERC20 bnMToken;
     mapping (address => uint) stakedAmounts;
 
     constructor(address _mooBnMToken,uint _apr,address _bnMToken) {
         mooBnMToken = IMooBnM(_mooBnMToken);
         currentAPR=_apr;
-        bnMToken = IBnM(_bnMToken);
+        bnMToken = IERC20(_bnMToken);
     }
     function setAPR(uint _newAPR) external {
         currentAPR=_newAPR;
