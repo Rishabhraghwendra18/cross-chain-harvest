@@ -2,14 +2,13 @@
 const hre = require("hardhat");
 const {verifyContract} = require("./verifyContract");
 
-async function deployERC20() {
-    console.log("Deploying MooBnM Token...");
-  const MooBnM = await hre.ethers.getContractFactory("MooBnM");
+async function deployERC20(tokenName) {
+  const MooBnM = await hre.ethers.getContractFactory(tokenName);
   const mooBnM = await MooBnM.deploy();
 
   await mooBnM.deployed();
   console.log(
-    `mooBnM is deployed at : ${mooBnM.address}`
+    `${tokenName} is deployed at : ${mooBnM.address}`
   );
   await mooBnM.deployTransaction.wait(5);
   console.log("Verifying contract....");
