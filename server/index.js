@@ -58,7 +58,17 @@ app.post('/setAPR', async (req, res) => {
   await client.set(network,apr);
   res.json({ message: `APR for ${network} set to ${apr}%` });
 });
-
+app.get('/currentStakedNetwork', async (req, res) => {
+  const client =await connectRedis();
+  const network=await client.get('currentNetwork');
+  res.json({success:true,network});
+})
+app.post('/setcurrentStakedNetwork', async (req, res) => {
+  const client =await connectRedis();
+  const { network } = req.body;
+  await client.set('currentNetwork',network);
+  res.json({success:true,message:'Setted the current staked network'})
+})
 if(process.env.ENVIRONMENT==="lambda"){
   module.exports.handler=serverless(app);
 }
