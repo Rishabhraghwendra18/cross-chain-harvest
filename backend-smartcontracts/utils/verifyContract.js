@@ -1,9 +1,10 @@
 const hre = require("hardhat");
 
-const verifyContract = async (address,constructorArguments=[])=>{
+const verifyContract = async (address,constructorArguments=[],contract)=>{
     await hre.run("verify:verify",{
         address,
-        constructorArguments
+        constructorArguments,
+        contract
     })
 }
 module.exports ={

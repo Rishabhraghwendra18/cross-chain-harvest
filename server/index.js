@@ -1,5 +1,6 @@
 const express = require('express');
 const {createClient}=require('redis');
+const cors=require('cors');
 const serverless = require('serverless-http');
 require('dotenv').config();
 
@@ -7,6 +8,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(cors());
 
 let aprs = {
   polygon: 8,
