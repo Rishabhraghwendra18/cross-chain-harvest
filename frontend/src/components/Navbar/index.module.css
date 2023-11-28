@@ -1,0 +1,38 @@
+.navbar{
+    height: fit-content;
+    position: fixed;
+    width: 100%;
+    display: flex;
+    padding: 1rem 3rem;
+    justify-content: center;
+    z-index: 10000;
+}
+.navbar_contents{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+}
+.logo{
+    font-weight: 600;
+    font-size: 1.43rem;
+}
+.navItems{
+    font-size: 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 3rem;
+}
+.navItems > a, .navbar_contents >a{
+    text-decoration: none;
+    cursor: pointer;
+}
+.unactive_link{
+    color: #767799;
+}
+.active_link{
+    color: white;
+    border-width: 1px;
+    border-bottom-style: solid;
+    height: fit-content;
+}
