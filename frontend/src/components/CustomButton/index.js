@@ -10,7 +10,11 @@ const CustomButton = styled(Button)(({theme})=>({
     border:'2px solid #B3EC11',
     borderRadius:'0.33rem',
     fontWeight:'bold',
-    textTransform:'none'
+    textTransform:'none',
+    ':hover':{
+        backgroundColor:'#B3EC11',
+        color:'black'
+    }
 }));
 
 function CustomCommonButton({children,sx,onClick,disable}) {

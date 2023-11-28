@@ -1,12 +1,81 @@
+.height100{
+  height: 100%;
+}
 .hero_section{
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   gap: 2rem;
-  height: 100%;
 }
 .hero_section > h1{
   text-align: center;
   font-size: 3em;
+}
+.markets{
+  padding: 5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 5rem;
+}
+.markets >h2{
+  font-size: 3rem;
+}
+.market_container{
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 3rem;
+}
+.token_market{
+  border: 2px solid #B3EC11;
+  border-radius: 1rem;
+  padding: 1rem;
+  font-size: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+}
+.token_market:hover{
+  background-color: #B3EC11;
+  color: black;
+}
+.apr{
+  display: flex;
+  justify-content: space-between;
+}
+.coverup{
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.606);
+}
+.supported_networks{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  height: 11.9rem;
+  background-color: #B3EC11;
+}
+.supported_networks_title{
+  font-size: 2.1rem;
+  color: black;
+}
+.networks_list{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  width: 100%;
+  
+}
+.network{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.network >span{
+  color: black;
 }
