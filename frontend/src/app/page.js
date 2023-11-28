@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from 'next/link';
 import styles from "./page.module.css";
 import CustomCommonButton from "../components/CustomButton";
 import BubbleComponent from "../components/BubblesAnimation";
@@ -121,7 +122,7 @@ export default function Home() {
           ))}
         </div>
       </div>
-      <div className={`${styles.markets} ${styles.height100}`}>
+      <div className={`${styles.markets}`}>
         <h2>
           CrossChain Harvest <span style={{ color: "#B3EC11" }}>Markets</span>
         </h2>
@@ -140,6 +141,9 @@ export default function Home() {
           ))}
         </div>
       </div>
+      <footer className={styles.footer}>
+        <span>Made with ❤️ at Chainlink Constellation Hackathon 2023 By <Link href={"https://www.linkedin.com/in/rishabh-sde/"} target="_blank">Rishabh Raghwendra</Link></span>
+      </footer>
     </ThemeProvider>
   );
 }
