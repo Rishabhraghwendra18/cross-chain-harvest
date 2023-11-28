@@ -8,18 +8,12 @@ interface ICCHBnMToken {
     function burnFrom(address account, uint256 value) external;
 }
 
-interface IRouter {
-    function transferTokensPayNative(
-        uint256 _amount
-    ) external returns (bytes32 messageId);
-}
-
 contract CCHarvestVault {
     mapping(address => uint) public stakedAmounts;
     address public deployerAddress;
     address public routerAddress;
-    address bnMToken;
-    address cchBnMToken;
+    address public bnMToken;
+    address public cchBnMToken;
     uint public routerWithdrawalLimit = 80;
 
     event Withdrawal(
@@ -67,15 +61,26 @@ contract CCHarvestVault {
     }
 
     // @dev only Router will be able to call this function
-    function routerWithdraw() external returns (uint) {
+    function routerWithdraw() external returns (bool,uint) {
         uint tokenBalance = IERC20(bnMToken).balanceOf(address(this));
+        require(tokenBalance>0,"Vault don't have any tokens");
         uint tokensToWithdraw = (routerWithdrawalLimit * tokenBalance) / 100;
-        IERC20(bnMToken).approve(routerAddress, tokensToWithdraw);
-        IRouter(routerAddress).transferTokensPayNative(tokensToWithdraw);
-        return tokensToWithdraw;
+        bool success = IERC20(bnMToken).transfer(routerAddress, tokensToWithdraw);
+        return (success,tokensToWithdraw);
     }
 
+    receive() external payable {}
+
     // @user users can call this function
+    function withdrawNative(address _beneficiary) external {
+        uint256 amount = address(this).balance;
+
+        // Attempt to send the funds, capturing the success status and discarding any return data
+        (bool sent, ) = _beneficiary.call{value: amount}("");
+
+        // Revert if the send failed, with information about the attempted transfer
+        require(sent,"Not able to withdraw");
+    }
     function withdraw(uint _amount) external returns (bool) {
         require(_amount > 0, "Amount should be greater than 0");
         require(stakedAmounts[msg.sender] <= _amount, "Insufficient Balance");

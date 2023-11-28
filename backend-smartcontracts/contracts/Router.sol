@@ -33,7 +33,7 @@ contract TokenTransferor is OwnerIsCreator {
     // Mapping to keep track of allowlisted destination chains.
     mapping(uint64 => bool) public allowlistedChains;
 
-    IRouterClient private s_router;
+    IRouterClient public s_router;
 
     IERC20 private s_linkToken;
     uint64 public _destinationChainSelector;
@@ -49,7 +49,24 @@ contract TokenTransferor is OwnerIsCreator {
         _destinationChainSelector=destinationChain;
         _token=_tokenAddress;
     }
+    function _setRouter(address _newRouter) public {
+        require(_newRouter != address(0), "Router address cannot be zero");
+        s_router = IRouterClient(_newRouter);
+    }
 
+    function _setLinkToken(address _newLinkToken) public {
+        require(_newLinkToken != address(0), "Link token address cannot be zero");
+        s_linkToken = IERC20(_newLinkToken);
+    }
+
+    function _setDestinationChainSelector(uint64 _newDestinationChain) public {
+        _destinationChainSelector = _newDestinationChain;
+    }
+
+    function _setToken(address _newTokenAddress) public {
+        require(_newTokenAddress != address(0), "Token address cannot be zero");
+        _token = _newTokenAddress;
+    }
     /// @dev Modifier that checks if the chain with the given destinationChainSelector is allowlisted.
     /// @param _destinationChainSelector The selector of the destination chain.
     modifier onlyAllowlistedChain(uint64 _destinationChainSelector) {
@@ -85,7 +102,7 @@ contract TokenTransferor is OwnerIsCreator {
         uint256 _amount
     )
         external
-        returns (bytes32 messageId)
+        returns (bytes32 messageId,bool)
     {
         // Create an EVM2AnyMessage struct in memory with necessary information for sending a cross-chain message
         // address(0) means fees are paid in native gas
@@ -126,7 +143,7 @@ contract TokenTransferor is OwnerIsCreator {
         );
 
         // Return the message ID
-        return messageId;
+        return (messageId,true);
     }
 
     /// @notice Construct a CCIP message.

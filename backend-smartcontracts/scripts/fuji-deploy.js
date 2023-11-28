@@ -8,13 +8,13 @@ const hre = require("hardhat");
 const {deployVault} = require("../utils/deployVault");
 const {verifyContract} = require("../utils/verifyContract");
 
-const ROUTER='0x70499c328e1e2a3c41108bd3730f6670a44595d1';
-const LINK='0x326C977E6efc84E512bB9C30f76E30c160eD06FB';
-const DESTINATION_CHAIN='14767482510784806043';
-const CCIP_BNM_TOKEN='0xf1E3A5842EeEF51F2967b3F05D45DD4f4205FF40';
-const FUNCTIONS_ROUTER='0x6E2dc0F9DB014aE19888F539E59285D2Ea04244C';
-const DON_ID='0x66756e2d706f6c79676f6e2d6d756d6261692d31000000000000000000000000';
-const FUNCTIONS_CONSUMER_ID=922;
+const ROUTER='0x554472a2720e5e7d5d3c817529aba05eed5f82d8';
+const LINK='0x0b9d5D9136855f6FEc3c0993feE6E9CE8a297846';
+const DESTINATION_CHAIN='12532609583862916517';
+const CCIP_BNM_TOKEN='0xD21341536c5cF5EB1bcb58f6723cE26e8D8E90e4';
+const FUNCTIONS_ROUTER='0xA9d587a00A31A52Ed70D6026794a8FC5E2F5dCb0';
+const DON_ID='0x66756e2d6176616c616e6368652d66756a692d31000000000000000000000000';
+const FUNCTIONS_CONSUMER_ID=1338;
 
 async function main() {
   // const beefyBnMVaultAddress = await deployVault();
@@ -29,22 +29,13 @@ async function main() {
   );
   await tokenTransferor.deployed();
   console.log("Deployed at: ",tokenTransferor.address);
-  // =================For Testing Only==================
-    const [owner] = await hre.ethers.getSigners();
-    await tokenTransferor.setReceiverContract(owner.address)
-    await owner.sendTransaction({
-      to:tokenTransferor.address,
-      value: hre.ethers.utils.parseEther("2.0"),
-    })
-    console.log("Matic and receiver address set!");
-  // ===================================================
   await tokenTransferor.deployTransaction.wait(5);
   await verifyContract(tokenTransferor.address,[ROUTER,
     LINK,
     DESTINATION_CHAIN,
     CCIP_BNM_TOKEN]);
 
-  console.log("\nDeploying CCHBnMToken...");
+  console.log("Deploying CCHBnMToken...\n");
   const CCHBnMToken = await hre.ethers.getContractFactory("CCHBnM");
   const cchBnMToken = await CCHBnMToken.deploy();
   await cchBnMToken.deployed();
@@ -52,7 +43,7 @@ async function main() {
   await cchBnMToken.deployTransaction.wait(5);
   await verifyContract(cchBnMToken.address,[],'contracts/CCHBnMToken.sol:CCHBnM');
 
-  console.log("\nDeploying Harvest Vault...");
+  console.log("Deploying Harvest Vault...\n");
   const CCHarvestVault = await hre.ethers.getContractFactory("CCHarvestVault");
   const ccharvestVault = await CCHarvestVault.deploy(
     CCIP_BNM_TOKEN,
@@ -66,14 +57,13 @@ async function main() {
     cchBnMToken.address,
     tokenTransferor.address]);
 
-  console.log("\nDeploying Function Consumer...");
+  console.log("Deploying Function Consumer...\n");
   const FunctionConsumer = await hre.ethers.getContractFactory("FunctionConsumer");
   const functionConsumer = await FunctionConsumer.deploy(
     FUNCTIONS_ROUTER,
     DON_ID,
     ccharvestVault.address,
-    FUNCTIONS_CONSUMER_ID,
-    tokenTransferor.address
+    FUNCTIONS_CONSUMER_ID
   );
   await functionConsumer.deployed();
   console.log("Deployed at: ",functionConsumer.address);
@@ -81,24 +71,8 @@ async function main() {
   await  verifyContract(functionConsumer.address,[FUNCTIONS_ROUTER,
     DON_ID,
     ccharvestVault.address,
-    FUNCTIONS_CONSUMER_ID,tokenTransferor.address]);
+    FUNCTIONS_CONSUMER_ID]);
   
-    console.log("\nDeploying Manager Contract...");
-    const Manager = await hre.ethers.getContractFactory("Manager");
-    const manager = await Manager.deploy(
-      tokenTransferor.address,
-      ccharvestVault.address,
-      functionConsumer.address
-    )
-    await manager.deployed();
-    console.log("Deployed at: ",manager.address);
-    await manager.deployTransaction.wait(5);
-    await verifyContract(manager.address,[
-      tokenTransferor.address,
-      ccharvestVault.address,
-      functionConsumer.address
-    ]);
-
   console.log("DEPLOYED AND VERIFIED ALL CONTRACTS...");
 
 }

@@ -10,9 +10,6 @@ import {FunctionsRequest} from "@chainlink/contracts/src/v0.8/functions/dev/v1_0
  * Find information on LINK Token Contracts and get the latest ETH and LINK faucets here: https://docs.chain.link/resources/link-token-contracts/
  */
 
-interface ICCHHarvestVault {
-    function routerWithdraw() external returns (uint);
-}
 /**
  * @title GettingStartedFunctionsConsumer
  * @notice This is an example contract to show how to make HTTP requests using Chainlink
@@ -25,9 +22,8 @@ contract FunctionConsumer is FunctionsClient, ConfirmedOwner {
     bytes32 public s_lastRequestId;
     bytes public s_lastResponse;
     bytes public s_lastError;
-    uint public currentAPR;
-    address public ccHarvestVault;
     uint64 public subscriptionId;
+    uint networkAPR;
 
     // Custom error type
     error UnexpectedRequestID(bytes32 requestId);
@@ -35,7 +31,7 @@ contract FunctionConsumer is FunctionsClient, ConfirmedOwner {
     // Event to log responses
     event Response(
         bytes32 indexed requestId,
-        string character,
+        uint apr,
         bytes response,
         bytes err
     );
@@ -45,7 +41,18 @@ contract FunctionConsumer is FunctionsClient, ConfirmedOwner {
     address  public router;
 
     //Callback gas limit
-    uint32 gasLimit = 300000;
+    uint32 public gasLimit = 300000;
+    string public source=
+     "const network = args[0];"
+        "const apiResponse = await Functions.makeHttpRequest({"
+        "url: `https://bi9x1g4gaa.execute-api.eu-north-1.amazonaws.com/dev/getAPR?network=$"
+        "{network}`});"
+        "if (apiResponse.error) {"
+        "throw Error('Request failed');"
+        "}"
+        "const { data } = apiResponse;"
+        "return Functions.encodeUint256(parseInt(data.apr));";
+
 
     // donID - Hardcoded for Mumbai
     // Check to get the donID for your supported network https://docs.chain.link/chainlink-functions/supported-networks
@@ -57,16 +64,14 @@ contract FunctionConsumer is FunctionsClient, ConfirmedOwner {
     /**
      * @notice Initializes the contract with the Chainlink router address and sets the contract owner
      */
-    constructor(address _router, bytes32 _donId,address _cchVault,uint64 _consumerId) FunctionsClient(_router) ConfirmedOwner(msg.sender) {
+    constructor(address _router, bytes32 _donId,address _cchVault,uint64 _consumerId,address _ccipRouter) FunctionsClient(_router) ConfirmedOwner(msg.sender) {
         router=_router;
         donID=_donId;
-        ccHarvestVault=_cchVault;
-        currentAPR=0;
         subscriptionId=_consumerId;
     }
     
-    function setCCHHarvestVault(address _vault) external {
-        ccHarvestVault=_vault;
+    function setDonId(bytes32 _donId) external {
+        donID=_donId;
     }
     function setSubscriptionId(uint64 _id) external {
         subscriptionId=_id;
@@ -77,9 +82,9 @@ contract FunctionConsumer is FunctionsClient, ConfirmedOwner {
      * @return requestId The ID of the request
      */
     function sendRequest(
-        string memory source,
+        // string memory source,
         string[] calldata args
-    ) external onlyOwner returns (bytes32 requestId) {
+    ) external returns (bytes32 requestId) {
         FunctionsRequest.Request memory req;
         req.initializeRequestForInlineJavaScript(source); // Initialize the request with JS code
         if (args.length > 0) req.setArgs(args); // Set the arguments for the request
@@ -94,9 +99,6 @@ contract FunctionConsumer is FunctionsClient, ConfirmedOwner {
 
         return s_lastRequestId;
     }
-    function setCurrentAPR(uint _apr)external{
-        currentAPR=_apr;
-    }
 
     function bytesToUint(bytes memory b) internal pure returns (uint256){
         uint256 number;
@@ -104,6 +106,17 @@ contract FunctionConsumer is FunctionsClient, ConfirmedOwner {
             number = number + uint(uint8(b[i]))*(2**(8*(b.length-(i+1))));
         }
     return number;
+    }
+
+    receive() external payable {}
+    function withdrawNative(address _beneficiary) external {
+        uint256 amount = address(this).balance;
+
+        // Attempt to send the funds, capturing the success status and discarding any return data
+        (bool sent, ) = _beneficiary.call{value: amount}("");
+
+        // Revert if the send failed, with information about the attempted transfer
+        require(sent,"Not able to withdraw");
     }
 
     /**
@@ -122,13 +135,14 @@ contract FunctionConsumer is FunctionsClient, ConfirmedOwner {
         }
         // Update the contract's state variables with the response and any errors
         s_lastResponse = response;
-        uint networkAPR = bytesToUint(response);
+        networkAPR = bytesToUint(response);
         s_lastError = err;
 
+        require(err.length==0,"Error occurred when calling API");
         // Emit an event to log the response
-        // emit Response(requestId, character, s_lastResponse, s_lastError);
-        if(currentAPR < networkAPR){
-            ICCHHarvestVault(ccHarvestVault).routerWithdraw();
-        }
+        emit Response(requestId, networkAPR, s_lastResponse, s_lastError);
+    }
+    function getNetworkAPR() external view returns (uint){
+        return networkAPR;
     }
 }
