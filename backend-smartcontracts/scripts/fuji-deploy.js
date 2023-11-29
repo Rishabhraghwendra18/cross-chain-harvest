@@ -29,6 +29,15 @@ async function main() {
   );
   await tokenTransferor.deployed();
   console.log("Deployed at: ",tokenTransferor.address);
+  // =================For Testing Only==================
+  const [owner] = await hre.ethers.getSigners();
+  await tokenTransferor.setReceiverContract(owner.address)
+  await owner.sendTransaction({
+    to:tokenTransferor.address,
+    value: hre.ethers.utils.parseEther("2.0"),
+  })
+  console.log("Matic and receiver address set!");
+// ===================================================
   await tokenTransferor.deployTransaction.wait(5);
   await verifyContract(tokenTransferor.address,[ROUTER,
     LINK,

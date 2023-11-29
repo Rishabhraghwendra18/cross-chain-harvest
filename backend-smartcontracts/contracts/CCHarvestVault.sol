@@ -15,6 +15,7 @@ contract CCHarvestVault {
     address public bnMToken;
     address public cchBnMToken;
     uint public routerWithdrawalLimit = 80;
+    uint public totalValueLocked=0;
 
     event Withdrawal(
         address indexed user,
@@ -55,6 +56,7 @@ contract CCHarvestVault {
         require(_amount > 0, "Amount should be greater than 0");
         IERC20(bnMToken).transferFrom(msg.sender, address(this), _amount);
         stakedAmounts[msg.sender] += _amount;
+        totalValueLocked+=_amount;
         ICCHBnMToken(cchBnMToken).mint(msg.sender, _amount);
         emit Deposit(msg.sender, _amount, stakedAmounts[msg.sender]);
         return true;
@@ -85,6 +87,7 @@ contract CCHarvestVault {
         require(_amount > 0, "Amount should be greater than 0");
         require(stakedAmounts[msg.sender] <= _amount, "Insufficient Balance");
         stakedAmounts[msg.sender] -= _amount;
+        totalValueLocked-=_amount;
         ICCHBnMToken(cchBnMToken).burnFrom(msg.sender, _amount);
         IERC20(bnMToken).transfer(msg.sender, _amount);
         emit Withdrawal(msg.sender, _amount, stakedAmounts[msg.sender]);

@@ -1,4 +1,5 @@
 require("@nomicfoundation/hardhat-toolbox");
+// require('hardhat-deploy');
 require("dotenv").config();
 
 /** @type import('hardhat/config').HardhatUserConfig */
@@ -30,7 +31,11 @@ module.exports = {
     // Your API key for Etherscan
     // Obtain one at https://etherscan.io/
     // apiKey: SNOW_TRACE_API_KEY,
-    apiKey: MUMBAI_POLYSCAN_API,
+    apiKey: {
+      polygonMumbai:MUMBAI_POLYSCAN_API,
+      avalancheFujiTestnet:SNOW_TRACE_API_KEY,
+      sepolia:ETHERSCAN_API_KEY,
+    },
     
   },
   sourcify: {
