@@ -20,7 +20,9 @@ export default function GridTable({tableHeading=[],tableData=[]}) {
                     <span key={index}>{data.apy}</span>
                     <span key={index}>{data.dailyAPY}</span>
                     <span key={index}>{data.tvl}</span>
-                    <span key={index}>{data?.render?data.render():data.actionButton}</span>
+                    {data?.render?data.render(data):
+                    <span key={index}>{data.actionButton}</span>    
+                }
                     </div>
                 ))}
             </div>

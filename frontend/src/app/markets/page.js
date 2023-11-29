@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import GridTable from "../../components/GridTable";
-import CustomCommonButton from "../../components/CustomButton"
+import DepositModal from "../../components/Modal";
 import styles from "./page.module.css";
 
 const materialUiTheme = createTheme({
@@ -52,35 +53,41 @@ const tableHeading=[
         key:"actionButton"
     },
 ];
-const tableData=[
-    {
-        sno:1,
-        token:"CCIP-BnM",
-        wallet:"$500",
-        deposited:"$20",
-        apy:"8.30%",
-        dailyAPY:"0.02%",
-        tvl:"$20",
-        actionButton:"Deposit",
-        render:()=>(
-            <span className={styles.action_btn}>Deposit</span>
-        )
-    },
-    {
-        sno:2,
-        token:"CCIP-LnM",
-        wallet:"$600",
-        deposited:"$10",
-        apy:"10.30%",
-        dailyAPY:"0.05%",
-        tvl:"$10",
-        actionButton:"Deposit",
-        render:()=>(
-            <span className={styles.action_btn}>Deposit</span>
-        )
-    },
-]
 export default function Markets() {
+    const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+    const [selectedToken, setSelectedToken] = useState();
+    const tableData=[
+        {
+            sno:1,
+            token:"CCIP-BnM",
+            wallet:"$500",
+            deposited:"$20",
+            apy:"8.30%",
+            dailyAPY:"0.02%",
+            tvl:"$20",
+            actionButton:"Deposit",
+            render:()=>(
+                <span className={styles.action_btn}>Deposit</span>
+            )
+        },
+        {
+            sno:2,
+            token:"CCIP-LnM",
+            wallet:"$600",
+            deposited:"$10",
+            apy:"10.30%",
+            dailyAPY:"0.05%",
+            tvl:"$10",
+            actionButton:"Deposit",
+            render:(row)=>(
+                <span className={styles.action_btn} onClick={()=>{
+                    console.log("clicking....")
+                    setIsDepositModalOpen(true)
+                    setSelectedToken(row)
+                }}>Deposit</span>
+            )
+        },
+    ];
     return(
         <ThemeProvider theme={materialUiTheme}>
             <CssBaseline/>
@@ -88,6 +95,9 @@ export default function Markets() {
                 <h1>Top Markets</h1>
                 <GridTable tableHeading={tableHeading} tableData={tableData}/>
             </div>
+                {isDepositModalOpen && <DepositModal open={isDepositModalOpen} setOpen={()=>{setIsDepositModalOpen(false);
+                setSelectedToken();
+                }} modalHeading={`Deposit ${selectedToken.token}`}/>}
         </ThemeProvider>
     )
 }
