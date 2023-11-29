@@ -7,3 +7,7 @@
 .action_btn{
     cursor: pointer;
 }
+.action_btn_container{
+    display: flex;
+    gap: 0.8rem;
+}

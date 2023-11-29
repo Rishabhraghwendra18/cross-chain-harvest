@@ -66,8 +66,15 @@ export default function Markets() {
             dailyAPY:"0.02%",
             tvl:"$20",
             actionButton:"Deposit",
-            render:()=>(
-                <span className={styles.action_btn}>Deposit</span>
+            render:(row)=>(
+                <div className={styles.action_btn_container}>
+                <span className={styles.action_btn} onClick={()=>{
+                    console.log("clicking....")
+                    setIsDepositModalOpen(true)
+                    setSelectedToken(row)
+                }}>Deposit</span>
+                <span className={styles.action_btn} onClick={()=>{}}>Withdraw</span>
+                </div>
             )
         },
         {
@@ -80,11 +87,14 @@ export default function Markets() {
             tvl:"$10",
             actionButton:"Deposit",
             render:(row)=>(
+                <div className={styles.action_btn_container}>
                 <span className={styles.action_btn} onClick={()=>{
                     console.log("clicking....")
                     setIsDepositModalOpen(true)
                     setSelectedToken(row)
                 }}>Deposit</span>
+                <span className={styles.action_btn} onClick={()=>{}}>Withdraw</span>
+                </div>
             )
         },
     ];
