@@ -1,0 +1,20 @@
+.table_heading{
+    display: grid;
+    grid-template-columns: 0.3fr repeat(7,minmax(0,1fr));
+    background-color: #333333;
+    padding: 1em;
+    color: #999CB3;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+.table_rows{
+    display: grid;
+    grid-template-columns: 0.3fr repeat(7,minmax(0,1fr));
+    padding: 1em;
+    border-bottom: 1px solid #999CB3;
+}
+.table_rows:hover{
+    background-color: #B3EC11;
+    color: black;
+    border-bottom: 1px solid black;
+}

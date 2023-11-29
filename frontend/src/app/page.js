@@ -130,8 +130,7 @@ export default function Home() {
         <div className={styles.market_container}>
           {markets.map((market,index)=>(
           <div className={styles.token_market} key={index}>
-            <div className={styles.coverup}></div>
-            <h4>{market.tokenName}</h4>
+            <h4>{market.tokenName} {market.disabled && "(Comming Soon...)"}</h4>
             <hr style={{color:'grey'}}></hr>
             <div className={styles.apr}>
               <span>APR: {market.apr}%</span>

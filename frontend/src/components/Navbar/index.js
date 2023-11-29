@@ -53,7 +53,7 @@ function Navbar() {
 
         <div className={styles.navItems}>
           <Link href="/" className={pathname==='/' ? styles.active_link:styles.unactive_link}>Home</Link>
-          <Link href="/bridge" className={pathname==='/bridge' ? styles.active_link:styles.unactive_link}>Market</Link>
+          <Link href="/markets" className={pathname==='/markets' ? styles.active_link:styles.unactive_link}>Markets</Link>
           <span className={styles.unactive_link}>Team</span>
         </div>
         <div>
