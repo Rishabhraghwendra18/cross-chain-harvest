@@ -5,6 +5,8 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import GridTable from "../../components/GridTable";
 import DepositModal from "../../components/Modal";
+import CCIPBnMABI from "../../ABI/ccip-bnm.json";
+import MumbaiVaultAddress from "../../ABI/vault.json";
 import styles from "./page.module.css";
 
 const materialUiTheme = createTheme({
@@ -66,6 +68,10 @@ export default function Markets() {
             dailyAPY:"0.02%",
             tvl:"$20",
             actionButton:"Deposit",
+            tokenAddress:'0xf1E3A5842EeEF51F2967b3F05D45DD4f4205FF40',
+            abi:CCIPBnMABI,
+            vaultAddress:process.env.NEXT_PUBLIC_VAULT_ADDRESS,
+            vaultAbi:MumbaiVaultAddress,
             render:(row)=>(
                 <div className={styles.action_btn_container}>
                 <span className={styles.action_btn} onClick={()=>{
@@ -85,6 +91,7 @@ export default function Markets() {
             apy:"10.30%",
             dailyAPY:"0.05%",
             tvl:"$10",
+            tokenAddress:'0xc1c76a8c5bfde1be034bbcd930c668726e7c1987',
             actionButton:"Deposit",
             render:(row)=>(
                 <div className={styles.action_btn_container}>
@@ -105,7 +112,7 @@ export default function Markets() {
                 <h1>Top Markets</h1>
                 <GridTable tableHeading={tableHeading} tableData={tableData}/>
             </div>
-                {isDepositModalOpen && <DepositModal open={isDepositModalOpen} setOpen={()=>{setIsDepositModalOpen(false);
+                {isDepositModalOpen && <DepositModal selectedToken={selectedToken} open={isDepositModalOpen} setOpen={()=>{setIsDepositModalOpen(false);
                 setSelectedToken();
                 }} modalHeading={`Deposit ${selectedToken.token}`}/>}
         </ThemeProvider>

@@ -12,16 +12,16 @@ export default function GridTable({tableHeading=[],tableData=[]}) {
             </div>
             <div>
                 {tableData?.map((data,index)=>(
-                    <div className={styles.table_rows}>
-                    <span key={index}>{data.sno}</span>
-                    <span key={index}>{data.token}</span>
-                    <span key={index}>{data.wallet}</span>
-                    <span key={index}>{data.deposited}</span>
-                    <span key={index}>{data.apy}</span>
-                    <span key={index}>{data.dailyAPY}</span>
-                    <span key={index}>{data.tvl}</span>
+                    <div className={styles.table_rows} key={index}>
+                    <span>{data.sno}</span>
+                    <span>{data.token}</span>
+                    <span>{data.wallet}</span>
+                    <span>{data.deposited}</span>
+                    <span>{data.apy}</span>
+                    <span>{data.dailyAPY}</span>
+                    <span>{data.tvl}</span>
                     {data?.render?data.render(data):
-                    <span key={index}>{data.actionButton}</span>    
+                    <span>{data.actionButton}</span>    
                 }
                     </div>
                 ))}

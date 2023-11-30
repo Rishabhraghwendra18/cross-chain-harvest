@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { ethers } from "ethers";
 import Link from "next/link";
 import { useWeb3ModalAccount } from "@web3modal/ethers5/react";
-import { ethers } from "ethers";
 import { Modal, Box, OutlinedInput, InputAdornment } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import CustomCommonButton from "../CustomButton";
-// import {getTokenAmountAfterFee} from "../../utils/getTokenAmountAfterFee";
-// import {approveTokens} from "../../utils/approveTokens";
-// import {getTranscationFee} from "../../utils/getTranscationFee";
-// import {transferTokens} from "../../utils/transferTokens";
-// import {getCCIPMessageId} from "../../service/chainlink-ccip";
+import {approveTokens} from "../../utils/approveTokens";
+import {userTokenBalance} from "../../utils/userTokenBalance";
+import {depositTokens} from "../../utils/depositTokens";
 import styles from "./index.module.css";
 
 const style = {
@@ -32,9 +30,7 @@ const Alert = React.forwardRef(function AlertRender(props, ref) {
 export default function ConfirmationModal({
   open,
   setOpen,
-  fromNetwork,
-  toNetwork,
-  selectedTokens = [],
+  selectedToken,
   modalHeading,
 }) {
   const { address } = useWeb3ModalAccount();
@@ -46,24 +42,30 @@ export default function ConfirmationModal({
   });
   const [isTokensApproved, setIsTokensApproved] = useState(false);
   const [tokenAmount, setTokenAmount] = useState(0);
+  const [maxTokenBalance, setMaxTokenBalance] = useState();
   useEffect(() => {
-    let onlySelectedTokens = selectedTokens?.filter(
-      (token) => token?.isSelected
-    );
-    onlySelectedTokens = onlySelectedTokens?.map((token) => ({
-      ...token,
-      finalAmount: "Loading...",
-    }));
-    setSelectedTokensList(onlySelectedTokens);
-    // getTokenRedeemAmount();
-  }, [selectedTokens]);
+    if(Object.keys(selectedToken).length>0 && address){
+      getUserTokenBalance();
+    }
+  }, [selectedToken,address]);
 
+  const getUserTokenBalance=async ()=>{
+    try {
+      const balance = await userTokenBalance(selectedToken.tokenAddress,selectedToken.abi,address);
+      console.log("user token balance: ",ethers.utils.formatEther(balance?.toString()));
+      setMaxTokenBalance(ethers.utils.formatEther(balance?.toString()));
+    } catch (error) {
+      console.log("Error while getting user token balance: ",error);
+      setOpenToaster({
+        open:true,
+        type:"error",
+        message:"Error while fetching token balance of user"
+      })
+    }
+  }
   const onApproveButtonClick = async () => {
     try {
-      for (let i = 0; i < selectedTokensList.length; i++) {
-        // await approveTokens(selectedTokensList[i]?.address,fromNetwork?.ccipAddress,selectedTokensList[i]?.abi,selectedTokensList[i]?.amount);
-        console.log("selectedTokensList: ", selectedTokensList);
-      }
+      await approveTokens(selectedToken.tokenAddress,selectedToken.vaultAddress,selectedToken.abi,tokenAmount);
       setOpenToaster({
         open: true,
         type: "success",
@@ -79,37 +81,25 @@ export default function ConfirmationModal({
       });
     }
   };
-
+  
   const handleConfirmTranscation = async () => {
     try {
-      let txnParams = {
-        destinationChain: toNetwork?.chainSelector,
-        receiver: address,
-        tokens: selectedTokensList?.map((token) => token?.address),
-        amounts: selectedTokensList?.map((token) =>
-          ethers.utils.parseUnits(token?.amount, "ether")
-        ),
-      };
-      //   let fees=await getTranscationFee(fromNetwork?.ccipAddress,fromNetwork?.abi,txnParams);
-      txnParams.value = fees;
-      console.log("txn::: ", txnParams, fromNetwork, fromNetwork);
-      //   let {contract,tx} = await transferTokens(fromNetwork?.ccipAddress,fromNetwork?.abi,txnParams);
-      //   contract.on('TokensTransferred',async ()=>{
-      //     await navigator.clipboard.writeText(tx?.hash);
-      //     setOpenToaster(
-      //       {
-      //         open:true,
-      //         type:'info',
-      //         message:<>Transcation ID copied to clipboard. See status at<Link href={selectedTokensList.length>0?`https://ccip.chain.link/tx/${tx?.hash}`:'https://ccip.chain.link/'} target='_blank'>CCIP Explorer</Link></>,
-      //       }
-      //     );
-      //   })
+      let {contract}= await depositTokens(selectedToken.vaultAddress,selectedToken.vaultAbi,tokenAmount);
+        contract.on('Deposit',async ()=>{
+          setOpenToaster(
+            {
+              open:true,
+              type:'success',
+              message:`${selectedToken.token} Deposited Successfully`,
+            }
+          );
+        })
     } catch (error) {
-      console.log("Error While Transfering Tokens: ", error);
+      console.log("Error While Depositing Tokens: ", error);
       setOpenToaster({
         open: true,
         type: "error",
-        message: "Error While Depositing Token",
+        message: `Error While Depositing Token ${selectedToken.token}`,
       });
     }
   };
@@ -139,24 +129,26 @@ export default function ConfirmationModal({
                   <b>Enter Amount</b>
                 </span>
                 <div className={styles.amount_input}>
-                  <OutlinedInput
-                    sx={{ width: "100%" }}
-                    id="tokenAmount"
-                    size="small"
-                    type={"number"}
-                    onChange={(e) => {
-                      setTokenAmount(e.target.value);
-                    }}
-                    value={tokenAmount}
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <button className={styles.max_btn} onClick={() => {}}>
-                          Max
-                        </button>
-                      </InputAdornment>
-                    }
-                    placeholder="Amount"
-                  />
+                  {maxTokenBalance!==undefined?(
+                    <OutlinedInput
+                      sx={{ width: "100%" }}
+                      id="tokenAmount"
+                      size="small"
+                      type={"number"}
+                      onChange={(e) => {
+                        setTokenAmount(e.target.value);
+                      }}
+                      value={tokenAmount}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <button className={styles.max_btn} onClick={() => {setTokenAmount(maxTokenBalance)}}>
+                            Max
+                          </button>
+                        </InputAdornment>
+                      }
+                      placeholder="Amount"
+                    />
+                  ):<span>Loading User {selectedToken.token} Balance</span>}
                 </div>
               </div>
             </div>

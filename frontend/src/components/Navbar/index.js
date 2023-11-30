@@ -35,7 +35,7 @@ function Navbar() {
   const { push } = useRouter();
   const onNavbarButtonClick=()=>{
     if(pathname === "/"){
-      push('/bridge');
+      push('/markets');
       return;
     }
     open();
