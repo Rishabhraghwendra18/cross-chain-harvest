@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
+import { ethers } from "ethers";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import GridTable from "../../components/GridTable";
 import DepositModal from "../../components/Modal";
 import CCIPBnMABI from "../../ABI/ccip-bnm.json";
 import MumbaiVaultAddress from "../../ABI/vault.json";
+import {totalValueLocked} from "../../utils/readVaultBalance";
 import styles from "./page.module.css";
 
 const materialUiTheme = createTheme({
@@ -58,7 +60,7 @@ const tableHeading=[
 export default function Markets() {
     const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
     const [selectedToken, setSelectedToken] = useState();
-    const tableData=[
+    const [tableData, setTableData] = useState([
         {
             sno:1,
             token:"CCIP-BnM",
@@ -66,7 +68,7 @@ export default function Markets() {
             deposited:"$20",
             apy:"8.30%",
             dailyAPY:"0.02%",
-            tvl:"$20",
+            tvl:"Loading...",
             actionButton:"Deposit",
             tokenAddress:'0xf1E3A5842EeEF51F2967b3F05D45DD4f4205FF40',
             abi:CCIPBnMABI,
@@ -104,7 +106,18 @@ export default function Markets() {
                 </div>
             )
         },
-    ];
+    ]);
+    useEffect(()=>{
+        getTVL();
+    },[]);
+    const getTVL=async()=>{
+        const tokens =[...tableData];
+        let tvl = await totalValueLocked(tokens[0].vaultAddress,tokens[0].vaultAbi);
+        tvl=ethers.utils.formatEther(tvl?.toString());
+        tvl=parseInt(Number(tvl));
+        tokens[0].tvl=`$${tvl}`;
+        setTableData(tokens);
+    }
     return(
         <ThemeProvider theme={materialUiTheme}>
             <CssBaseline/>
