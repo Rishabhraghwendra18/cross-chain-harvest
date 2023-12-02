@@ -2,10 +2,10 @@
 "Elevate Your DeFi Yields Across Chains with CrossChain Harvest 🚀"
 
 ## 🌐 Problem
-In a $47 billion DeFi market dominated by various protocols and yield aggregators, CrossChain Harvest emerges as a game-changer. Traditional yield aggregators like Beefy and Harvest Finance automate yield optimization within a single blockchain, limiting users to the opportunities on that specific chain.
+The current DeFi market, valued at $47 billion, is dominated by protocols like Beefy and Harvest Finance. However, these yield aggregators are limited to optimizing yields within the single blockchain network, missing out on potential opportunities across different EVM chains. Manual fund movements between networks,using bridges, are risky, time-consuming, and costly, hindering users from accessing the best yields available.
 
 ## 💡 Solution
-Enter CrossChain Harvest, a revolutionary web3 protocol designed to overcome the limitations of existing yield aggregators. By automatically seeking the best yields across diverse DeFi protocols on various EVM chains, CrossChain Harvest eliminates the need for users to manually monitor and move their funds between networks. Leveraging Chainlink CCIP for secure token bridging, our protocol ensures a seamless and risk-free experience for users.
+Enter CrossChain Harvest, a revolutionary web3 protocol designed to overcome the limitations of existing yield aggregators. By automatically seeking the best yields across diverse DeFi protocols on various EVM chains, CrossChain Harvest eliminates the need for users to manually monitor and move their funds between networks for better yields. Leveraging Chainlink CCIP for secure token bridging, our protocol ensures a seamless and risk-free experience for users.
 
 ## 🚀 Key Features
 - **Cross-Chain Yield Optimization:** Monitor and optimize yields across different EVM chains, including Ethereum, Avalanche, and more.
