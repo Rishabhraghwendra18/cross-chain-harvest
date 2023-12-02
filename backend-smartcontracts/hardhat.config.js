@@ -22,8 +22,9 @@ module.exports = {
       url: ALCHEMY_MUMBAI_API_KEY,
       accounts: [PRIVATE_KEY],
     },
-    fuji:{
-      url:QUICK_NODE_FUJI_API_KEY,
+    snowtrace:{
+      // url:QUICK_NODE_FUJI_API_KEY,
+      url:'https://api.avax-test.network/ext/bc/C/rpc',
       accounts: [PRIVATE_KEY],
     }
   },
@@ -33,10 +34,19 @@ module.exports = {
     // apiKey: SNOW_TRACE_API_KEY,
     apiKey: {
       polygonMumbai:MUMBAI_POLYSCAN_API,
-      avalancheFujiTestnet:SNOW_TRACE_API_KEY,
+      snowtrace: "snowtrace",
       sepolia:ETHERSCAN_API_KEY,
     },
-    
+    customChains: [
+      {
+        network: "snowtrace",
+        chainId: 43113,
+        urls: {
+          apiURL: "https://api.routescan.io/v2/network/testnet/evm/43113/etherscan",
+          browserURL: "https://avalanche.testnet.routescan.io"
+        }
+      }
+    ]
   },
   sourcify: {
     // Disabled by default

@@ -30,21 +30,21 @@ async function main() {
   await tokenTransferor.deployed();
   console.log("Deployed at: ",tokenTransferor.address);
   // =================For Testing Only==================
-  const [owner] = await hre.ethers.getSigners();
-  await tokenTransferor.setReceiverContract(owner.address)
-  await owner.sendTransaction({
-    to:tokenTransferor.address,
-    value: hre.ethers.utils.parseEther("2.0"),
-  })
-  console.log("Matic and receiver address set!");
-// ===================================================
+    const [owner] = await hre.ethers.getSigners();
+    await tokenTransferor.setReceiverContract(owner.address)
+    await owner.sendTransaction({
+      to:tokenTransferor.address,
+      value: hre.ethers.utils.parseEther("2.0"),
+    })
+    console.log("Matic and receiver address set!");
+  // ===================================================
   await tokenTransferor.deployTransaction.wait(5);
   await verifyContract(tokenTransferor.address,[ROUTER,
     LINK,
     DESTINATION_CHAIN,
     CCIP_BNM_TOKEN]);
 
-  console.log("Deploying CCHBnMToken...\n");
+  console.log("\nDeploying CCHBnMToken...");
   const CCHBnMToken = await hre.ethers.getContractFactory("CCHBnM");
   const cchBnMToken = await CCHBnMToken.deploy();
   await cchBnMToken.deployed();
@@ -52,7 +52,7 @@ async function main() {
   await cchBnMToken.deployTransaction.wait(5);
   await verifyContract(cchBnMToken.address,[],'contracts/CCHBnMToken.sol:CCHBnM');
 
-  console.log("Deploying Harvest Vault...\n");
+  console.log("\nDeploying Harvest Vault...");
   const CCHarvestVault = await hre.ethers.getContractFactory("CCHarvestVault");
   const ccharvestVault = await CCHarvestVault.deploy(
     CCIP_BNM_TOKEN,
@@ -66,13 +66,14 @@ async function main() {
     cchBnMToken.address,
     tokenTransferor.address]);
 
-  console.log("Deploying Function Consumer...\n");
+  console.log("\nDeploying Function Consumer...");
   const FunctionConsumer = await hre.ethers.getContractFactory("FunctionConsumer");
   const functionConsumer = await FunctionConsumer.deploy(
     FUNCTIONS_ROUTER,
     DON_ID,
     ccharvestVault.address,
-    FUNCTIONS_CONSUMER_ID
+    FUNCTIONS_CONSUMER_ID,
+    tokenTransferor.address
   );
   await functionConsumer.deployed();
   console.log("Deployed at: ",functionConsumer.address);
@@ -80,12 +81,27 @@ async function main() {
   await  verifyContract(functionConsumer.address,[FUNCTIONS_ROUTER,
     DON_ID,
     ccharvestVault.address,
-    FUNCTIONS_CONSUMER_ID]);
+    FUNCTIONS_CONSUMER_ID,tokenTransferor.address]);
   
+    console.log("\nDeploying Manager Contract...");
+    const Manager = await hre.ethers.getContractFactory("Manager");
+    const manager = await Manager.deploy(
+      tokenTransferor.address,
+      ccharvestVault.address,
+      functionConsumer.address
+    )
+    await manager.deployed();
+    console.log("Deployed at: ",manager.address);
+    await manager.deployTransaction.wait(5);
+    await verifyContract(manager.address,[
+      tokenTransferor.address,
+      ccharvestVault.address,
+      functionConsumer.address
+    ]);
+
   console.log("DEPLOYED AND VERIFIED ALL CONTRACTS...");
 
 }
-
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 main().catch((error) => {
